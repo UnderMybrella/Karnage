@@ -213,7 +213,7 @@ object BC7PixelData {
                         val p = (0 until 6).map { block[1] }
                         val indices = (0 until 16).map { if (isAnchorIndex(partition, modeBit, it)) block[2] else block[3] }
 
-                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices)
+                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices, null, null, null)
                     }
                     1 -> {
                         val partition = block[6]
@@ -223,7 +223,7 @@ object BC7PixelData {
                         val p = (0 until 2).map { block[1] }
                         val indices = (0 until 16).map { if (isAnchorIndex(partition, modeBit, it)) block[2] else block[3] }
 
-                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices)
+                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices, null, null, null)
                     }
                     2 -> {
                         val partition = block[6]
@@ -232,7 +232,7 @@ object BC7PixelData {
                         val blue = (0 until 6).map { block[5] }
                         val indices = (0 until 16).map { if (isAnchorIndex(partition, modeBit, it)) block[1] else block[2] }
 
-                        mode = BC7Mode(modeBit, partition, red, green, blue, null, null, indices)
+                        mode = BC7Mode(modeBit, partition, red, green, blue, null, null, indices, null, null, null)
                     }
                     3 -> {
                         val partition = block[6]
@@ -243,22 +243,35 @@ object BC7PixelData {
 
                         val indices = (0 until 16).map { if (isAnchorIndex(partition, modeBit, it)) block[1] else block[2] }
 
-                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices)
+                        mode = BC7Mode(modeBit, partition, red, green, blue, null, p, indices, null, null, null)
                     }
-//                    4 -> {
-//                        val rotation = block[2]
-//                        val idxMode = block[1]
-//
-//                        val red = (0 until 2).map { block[5] }
-//                        val green = (0 until 2).map { block[5] }
-//                        val blue = (0 until 2).map { block[5] }
-//                        val alpha = (0 until 2).map { block[6] }
-//
-//                        val twoBitIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[1] else block[2] }
-//                        val threeBitIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[2] else block[3] }
-//
-//                        mode = BC7Mode(modeBit, 0, red, green, blue, alpha, null, if(idxMode == 0) twoBitIndices else threeBitIndices)
-//                    }
+                    4 -> {
+                        val rotation = block[2]
+                        val idxMode = block[1]
+
+                        val red = (0 until 2).map { block[5] }
+                        val green = (0 until 2).map { block[5] }
+                        val blue = (0 until 2).map { block[5] }
+                        val alpha = (0 until 2).map { block[6] }
+
+                        val twoBitIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[1] else block[2] }
+                        val threeBitIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[2] else block[3] }
+
+                        mode = BC7Mode(modeBit, 0, red, green, blue, alpha, null, twoBitIndices, threeBitIndices, rotation, idxMode)
+                    }
+                    5 -> {
+                        val rotation = block[2]
+
+                        val red = (0 until 2).map { block[7] }
+                        val green = (0 until 2).map { block[7] }
+                        val blue = (0 until 2).map { block[7] }
+                        val alpha = (0 until 2).map { block[8] }
+
+                        val rgbIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[1] else block[2] }
+                        val alphaIndices = (0 until 16).map { if(isAnchorIndex(0, modeBit, it)) block[1] else block[2] }
+
+                        mode = BC7Mode(modeBit, 0, red, green, blue, alpha, null, rgbIndices, alphaIndices, rotation, null)
+                    }
                     6 -> {
                         val red = (0 until 2).map { block[7] }
                         val green = (0 until 2).map { block[7] }
@@ -267,7 +280,7 @@ object BC7PixelData {
                         val p = (0 until 2).map { block[1] }
                         val indices = (0 until 16).map { if (isAnchorIndex(0, modeBit, it)) block[3] else block[4] }
 
-                        mode = BC7Mode(modeBit, 0, red, green, blue, alpha, p, indices)
+                        mode = BC7Mode(modeBit, 0, red, green, blue, alpha, p, indices, null, null, null)
                     }
                     7 -> {
                         val partition = block[6]
@@ -278,7 +291,7 @@ object BC7PixelData {
                         val p = (0 until 4).map { block[1] }
                         val indices = (0 until 16).map { if (isAnchorIndex(partition, modeBit, it)) block[1] else block[2] }
 
-                        mode = BC7Mode(modeBit, partition, red, green, blue, alpha, p, indices)
+                        mode = BC7Mode(modeBit, partition, red, green, blue, alpha, p, indices, null, null, null)
                     }
                     else -> {
                         System.err.println("Mode: $modeBit"); block[127 - modeBit]; continue@loop
@@ -288,10 +301,27 @@ object BC7PixelData {
                 val numberOfSubsets = NUMBER_OF_SUBSETS[modeBit]
                 val endpoints = getEndpoints(mode)
 
-                mode.indices.forEachIndexed { index, palette ->
+                for(index in 0 until 16) {
+                    val rgbPalette = mode.indices[index]
+                    val alphaPalette = (mode.alphaIndices ?: mode.indices)[index]
+
                     val subset = getSubset(mode.partitions, index, numberOfSubsets)
                     val endpoint = endpoints[subset]
-                    img.setRGB((supposedIndex % (width / 4)) * 4 + (index % 4), (supposedIndex / (width / 4)) * 4 + (index / 4), interpolate(endpoint, palette, mode.mode).rgb)
+                    val interpolated = interpolate(endpoint, rgbPalette, alphaPalette, mode.selectionBit, mode.mode)
+
+                    val x = (supposedIndex % (width / 4)) * 4 + (index % 4)
+                    val y = (supposedIndex / (width / 4)) * 4 + (index / 4)
+
+                    if(mode.rotation == null)
+                        img.setRGB(x, y, interpolated.rgb)
+                    else {
+                        when(mode.rotation) {
+                            1 -> img.setRGB(x, y, Color(interpolated.alpha, interpolated.green, interpolated.blue, interpolated.red).rgb)
+                            2 -> img.setRGB(x, y, Color(interpolated.red, interpolated.alpha, interpolated.blue, interpolated.green).rgb)
+                            3 -> img.setRGB(x, y, Color(interpolated.red, interpolated.green, interpolated.alpha, interpolated.blue).rgb)
+                            else -> img.setRGB(x, y, interpolated.rgb)
+                        }
+                    }
                 }
             }
         }
@@ -406,13 +436,22 @@ object BC7PixelData {
         return endpoints.map { (a, b) -> Color(a[0], a[1], a[2], a[3]) to Color(b[0], b[1], b[2], b[3]) }.toTypedArray()
     }
 
-    fun interpolate(endpoints: Pair<Color, Color>, index: Int, mode: Int): Color {
-        val r = interpolate(endpoints.first.red, endpoints.second.red, index, COLOUR_INDEX_BITCOUNT[mode])
-        val g = interpolate(endpoints.first.green, endpoints.second.green, index, COLOUR_INDEX_BITCOUNT[mode])
-        val b = interpolate(endpoints.first.blue, endpoints.second.blue, index, COLOUR_INDEX_BITCOUNT[mode])
-        val a = interpolate(endpoints.first.alpha, endpoints.second.alpha, index, ALPHA_INDEX_BITCOUNT[mode])
+    fun interpolate(endpoints: Pair<Color, Color>, index: Int, alphaIndex: Int, selectionBit: Int?, mode: Int): Color {
+        if (selectionBit == 1) {
+            val r = interpolate(endpoints.first.red, endpoints.second.red, alphaIndex, ALPHA_INDEX_BITCOUNT[mode])
+            val g = interpolate(endpoints.first.green, endpoints.second.green, alphaIndex, ALPHA_INDEX_BITCOUNT[mode])
+            val b = interpolate(endpoints.first.blue, endpoints.second.blue, alphaIndex, ALPHA_INDEX_BITCOUNT[mode])
+            val a = interpolate(endpoints.first.alpha, endpoints.second.alpha, index, COLOUR_INDEX_BITCOUNT[mode])
 
-        return Color(r, g, b, a)
+            return Color(r, g, b, a)
+        } else {
+            val r = interpolate(endpoints.first.red, endpoints.second.red, index, COLOUR_INDEX_BITCOUNT[mode])
+            val g = interpolate(endpoints.first.green, endpoints.second.green, index, COLOUR_INDEX_BITCOUNT[mode])
+            val b = interpolate(endpoints.first.blue, endpoints.second.blue, index, COLOUR_INDEX_BITCOUNT[mode])
+            val a = interpolate(endpoints.first.alpha, endpoints.second.alpha, alphaIndex, ALPHA_INDEX_BITCOUNT[mode])
+
+            return Color(r, g, b, a)
+        }
     }
     //= Color(endpoints.first[0], endpoints.first[1], endpoints.first[2], endpoints.first[3])
 
