@@ -16,7 +16,8 @@ object TGAPixelData: RawPixelData<TGAHeader> {
 
         when(header.imageType) {
             RGB_RLE -> {
-                println(header.pixelDepth)
+                if(header.pixelDepth != 32)
+                    println(header.pixelDepth)
 
                 var i: Int = 0
                 do {
