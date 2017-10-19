@@ -2,10 +2,9 @@ package org.abimon.karnage.raw
 
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.InputStream
 
-object BC7PixelData {
+object BC7PixelData: RawPixelDataNoHeader {
     val NUMBER_OF_SUBSETS = arrayOf(3, 2, 3, 2, 1, 1, 1, 2)
     val UNIQUE_PBITS = arrayOf(true, false, false, true, false, false, true, true)
 
@@ -186,9 +185,7 @@ object BC7PixelData {
     val A_WEIGHT_3 = arrayOf(0, 9, 18, 27, 37, 46, 55, 64)
     val A_WEIGHT_4 = arrayOf(0, 4, 9, 13, 17, 21, 26, 30, 34, 38, 43, 47, 51, 55, 60, 64)
 
-    fun read(width: Int, height: Int, file: File): BufferedImage = read(width, height, file.inputStream())
-
-    fun read(width: Int, height: Int, inputStream: InputStream): BufferedImage {
+    override fun read(width: Int, height: Int, inputStream: InputStream, header: Unit): BufferedImage {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
 
         inputStream.use { stream ->
