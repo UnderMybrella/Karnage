@@ -192,7 +192,7 @@ object BC7PixelData {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
 
         inputStream.use { stream ->
-            val block = BC7Block(inputStream)
+            val block = BC7Block(stream)
 
             loop@ for (supposedIndex in 0 until ((height * width) / 16)) {
                 val mode: BC7Mode
@@ -294,7 +294,14 @@ object BC7PixelData {
                         mode = BC7Mode(modeBit, partition, red, green, blue, alpha, p, indices, null, null, null)
                     }
                     else -> {
-                        System.err.println("Mode: $modeBit"); block[127 - modeBit]; continue@loop
+                        System.err.println("Mode: $modeBit");
+                        val buffer = block[127 - modeBit]
+                        for(index in 0 until 16) {
+                            val x = (supposedIndex % (width / 4)) * 4 + (index % 4)
+                            val y = (supposedIndex / (width / 4)) * 4 + (index / 4)
+                            img.setRGB(x, y, Color.BLACK.rgb)
+                        }
+                        continue@loop
                     }
                 }
 
