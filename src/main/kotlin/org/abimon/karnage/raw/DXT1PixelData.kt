@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage
 import java.io.InputStream
 
 object DXT1PixelData: RawPixelDataNoHeader {
-    override fun read(width: Int, height: Int, inputStream: InputStream, header: Unit): BufferedImage {
+    override fun read(width: Int, height: Int, inputStream: InputStream): BufferedImage {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         inputStream.use { stream ->
             for (supposedIndex in 0 until ((height * width) / 16)) {

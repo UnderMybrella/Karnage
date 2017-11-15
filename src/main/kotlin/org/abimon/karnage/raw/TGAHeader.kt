@@ -1,6 +1,6 @@
 package org.abimon.karnage.raw
 
-import org.abimon.karnage.util.toInt16
+import org.abimon.karnage.util.BitModification
 
 data class TGAHeader(
     val idLength: Int,
@@ -23,14 +23,14 @@ data class TGAHeader(
             header[1].toInt() and 0xFF,
             header[2].toInt() and 0xFF,
 
-            toInt16(header[3], header[4]),
-            toInt16(header[5], header[6]),
+            BitModification.toInt16(header[3], header[4]),
+            BitModification.toInt16(header[5], header[6]),
             header[7].toInt() and 0xFF,
 
-            toInt16(header[8], header[9]),
-            toInt16(header[10], header[11]),
-            toInt16(header[12], header[13]),
-            toInt16(header[14], header[15]),
+            BitModification.toInt16(header[8], header[9]),
+            BitModification.toInt16(header[10], header[11]),
+            BitModification.toInt16(header[12], header[13]),
+            BitModification.toInt16(header[14], header[15]),
 
             header[16].toInt() and 0xFF,
             header[17].toInt() and 0xFF

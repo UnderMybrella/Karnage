@@ -185,7 +185,7 @@ object BC7PixelData: RawPixelDataNoHeader {
     val A_WEIGHT_3 = arrayOf(0, 9, 18, 27, 37, 46, 55, 64)
     val A_WEIGHT_4 = arrayOf(0, 4, 9, 13, 17, 21, 26, 30, 34, 38, 43, 47, 51, 55, 60, 64)
 
-    override fun read(width: Int, height: Int, inputStream: InputStream, header: Unit): BufferedImage {
+    override fun read(width: Int, height: Int, inputStream: InputStream): BufferedImage {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
 
         inputStream.use { stream ->
@@ -194,7 +194,7 @@ object BC7PixelData: RawPixelDataNoHeader {
             loop@ for (supposedIndex in 0 until ((height * width) / 16)) {
                 val mode: BC7Mode
                 var modeBit: Int = 0
-                
+
                 for(i in 0 until 8) {
                     if(block[1] == 1)
                         break
