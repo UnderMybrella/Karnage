@@ -1,5 +1,6 @@
 package org.abimon.karnage.raw
 
+import org.abimon.karnage.readers.TGAImageReader
 import org.abimon.karnage.util.BitModification
 
 data class TGAHeader(
@@ -35,4 +36,7 @@ data class TGAHeader(
             header[16].toInt() and 0xFF,
             header[17].toInt() and 0xFF
     )
+
+    val isValid: Boolean
+        get() = imageType in TGAPixelData.VALID_IMAGE_TYPES && imageWidth in TGAImageReader.MAXIMUM_WIDTH_RANGE && imageHeight in TGAImageReader.MAXIMUM_HEIGHT_RANGE
 }

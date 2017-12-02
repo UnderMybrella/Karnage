@@ -15,6 +15,10 @@ import javax.imageio.stream.ImageInputStream
 class TGAImageReader(originatingProvider: ImageReaderSpi): ImageReader(originatingProvider) {
     companion object Specifications {
         val HEADER_LENGTH = 18
+        var MAXIMUM_WIDTH_RANGE = (1 until 8192)
+        var MAXIMUM_HEIGHT_RANGE = (1 until 8192)
+
+
     }
 
     lateinit var header: TGAHeader
@@ -43,6 +47,9 @@ class TGAImageReader(originatingProvider: ImageReaderSpi): ImageReader(originati
 
     override fun read(imageIndex: Int, param: ImageReadParam?): BufferedImage? {
         readHeader()
+
+        if(!header.isValid)
+            return null
 
         when(input ?: return null) {
             //is File -> return TGAPixelData.read(header.imageWidth, header.imageHeight, ImageInputStreamWrapper(input as ImageInputStream), header)
