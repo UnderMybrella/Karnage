@@ -3,7 +3,6 @@ package org.abimon.karnage.util
 import java.io.InputStream
 
 class BitPool(val input: InputStream) {
-
     var bitpool = 0
     var bitsLeft = 0
 
