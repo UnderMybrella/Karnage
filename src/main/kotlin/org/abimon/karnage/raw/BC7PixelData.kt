@@ -291,7 +291,7 @@ object BC7PixelData: RawPixelDataNoHeader {
                         mode = BC7Mode(modeBit, partition, red, green, blue, alpha, p, indices, null, null, null)
                     }
                     else -> {
-                        System.err.println("Mode: $modeBit");
+                        System.err.println("Mode: $modeBit")
                         val buffer = block[127 - modeBit]
                         for(index in 0 until 16) {
                             val x = (supposedIndex % (width / 4)) * 4 + (index % 4)
