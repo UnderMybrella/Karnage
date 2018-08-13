@@ -3,7 +3,6 @@ package org.abimon.karnage.util
 import java.io.InputStream
 
 object BitModification {
-
     fun toInt16(lower: Byte, upper: Byte): Int = (lower.toInt() and 0xFF) or ((upper.toInt() and 0xFF) shl 8)
     fun toInt32(a: Byte, b: Byte, c: Byte, d: Byte): Int = (a.toInt() and 0xFF) or ((b.toInt() and 0xFF) shl 8) or ((c.toInt() and 0xFF) shl 16) or ((d.toInt() and 0xFF) shl 24)
 
@@ -37,7 +36,7 @@ object BitModification {
         return r
     }
 
-    fun toARGB(r: Int, g: Int, b: Int, a: Int): Int
+    inline fun toARGB(r: Int, g: Int, b: Int, a: Int): Int
             = (a and 0xFF shl 24) or
             (r and 0xFF shl 16) or
             (g and 0xFF shl 8) or
