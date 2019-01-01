@@ -13,6 +13,7 @@ object TGAPixelData: RawPixelData<TGAHeader> {
 
     public val VALID_IMAGE_TYPES = arrayOf(COLORMAP, RGB, GRAYSCALE, COLORMAP_RLE, RGB_RLE, GRAYSCALE_RLE)
 
+    fun read(inputStream: InputStream, header: TGAHeader): BufferedImage = read(header.imageWidth, header.imageHeight, inputStream, header)
     override fun read(width: Int, height: Int, inputStream: InputStream, header: TGAHeader): BufferedImage {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
 
